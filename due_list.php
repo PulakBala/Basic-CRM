@@ -1,6 +1,7 @@
 <?php
 include ('includes/header.php');
 include ('includes/sidebar.php');
+include('pagination.php');
 ?>
 
 <div class="container mt-5">
@@ -26,33 +27,35 @@ include ('includes/sidebar.php');
             </thead>
             <tbody id="table-body">
             <?php
-            try {
-                // Fetch all contacts
-                $stmt = $conn->query('SELECT id, name, amount, service, account, mobile, address FROM dues ORDER BY created_at DESC');
-                $count = 1;
+                try {
+                    $pagination = paginate($conn, 'dues', 'id, name, amount, service, account, mobile, address', '', 'created_at DESC', 10);
+                    $count = ($pagination['current_page'] - 1) * 10 + 1;
 
-                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                    echo '<tr>';
-                    echo '<td>' . $count++ . '</td>';
-                    echo '<td>' . htmlspecialchars($row['name']) . '</td>';
-                    echo '<td>' . htmlspecialchars($row['amount']) . '</td>';
-                    echo '<td>' . htmlspecialchars($row['service']) . '</td>';
-                    echo '<td>' . htmlspecialchars($row['account']) . '</td>';
-                    echo '<td>' . htmlspecialchars($row['mobile']) . '</td>';
-                    echo '<td>' . htmlspecialchars($row['address']) . '</td>';
-                    echo "<td>
-                                      <a href='edit_due.php?table=dues&id=" . $row['id'] . "&redirect=due_list.php' class='btn btn-sm btn-warning'>Edit</a>
-                                      <a href='delete.php?table=dues&id=" . $row['id'] . "&redirect=due_list.php' class='btn btn-sm btn-danger' onclick=\"return confirm('Are you sure?');\">Delete</a>
-  
-                                   </td>";
-                    echo '</tr>';
+                    foreach ($pagination['data'] as $row) {
+                        echo '<tr>';
+                        echo '<td>' . $count++ . '</td>';
+                        echo '<td>' . htmlspecialchars($row['name']) . '</td>';
+                        echo '<td>' . htmlspecialchars($row['amount']) . '</td>';
+                        echo '<td>' . htmlspecialchars($row['service']) . '</td>';
+                        echo '<td>' . htmlspecialchars($row['account']) . '</td>';
+                        echo '<td>' . htmlspecialchars($row['mobile']) . '</td>';
+                        echo '<td>' . htmlspecialchars($row['address']) . '</td>';
+                        echo "<td>
+                                <a href='edit_due.php?table=dues&id=" . $row['id'] . "&redirect=due_list.php' class='btn btn-sm btn-warning'>Edit</a>
+                                <a href='delete.php?table=dues&id=" . $row['id'] . "&redirect=due_list.php' class='btn btn-sm btn-danger' onclick=\"return confirm('Are you sure?');\">Delete</a>
+                            </td>";
+                        echo '</tr>';
+                    }
+                } catch (PDOException $e) {
+                    echo '<tr><td colspan="8" class="text-danger">Error: ' . $e->getMessage() . '</td></tr>';
                 }
-            } catch (PDOException $e) {
-                echo '<tr><td colspan="7" class="text-danger">Error: ' . $e->getMessage() . '</td></tr>';
-            }
-            ?>
-            </tbody>
-        </table>
+                ?>
+                            </tbody>
+                            
+                        </table>
+                        <?php
+                renderPagination($pagination['total_pages'], $pagination['current_page'], 'due_list.php');
+                ?>
             </div>
         </div>
     </div>

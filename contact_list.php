@@ -1,6 +1,7 @@
 <?php
 include ('includes/header.php');
 include ('includes/sidebar.php');
+include('pagination.php');
 ?>
 
 <div class="container mt-5">
@@ -28,10 +29,12 @@ include ('includes/sidebar.php');
                         <?php
                         try {
                             // Fetch all contacts
-                            $stmt = $conn->query('SELECT * FROM contacts ORDER BY created_at DESC');
-                            $count = 1;
+                            // $stmt = $conn->query('SELECT * FROM contacts ORDER BY created_at DESC');
+                            // $count = 1;
+                            $pagination = paginate($conn, 'contacts', 'id, name, mobile, address, service, facebook', '', 'created_at DESC', 10);
+                            $count = ($pagination['current_page'] - 1) * 10 + 1;
 
-                            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                            foreach ($pagination['data'] as $row) {
                                 echo '<tr>';
                                 echo '<td>' . $count++ . '</td>';
                                 echo '<td>' . htmlspecialchars($row['name']) . '</td>';
@@ -55,6 +58,9 @@ include ('includes/sidebar.php');
                         <!-- End example -->
                     </tbody>
                 </table>
+                <?php
+                renderPagination($pagination['total_pages'], $pagination['current_page'], 'contact_list.php');
+                ?>
             </div>
         </div>
     </div>

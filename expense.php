@@ -1,11 +1,7 @@
 <?php
-session_start();
-if (!isset($_SESSION['admin_logged_in'])) {
-    header('Location: login.php');
-    exit;
-}
 include ('includes/header.php');
 include ('includes/sidebar.php');
+include ('pagination.php');
 ?>
 <div class="container mt-5">
     <div class="card shadow-sm">
@@ -29,25 +25,33 @@ include ('includes/sidebar.php');
                         <!-- Sample Row (replace with PHP loop) -->
                         <?php
 
-                        $stmt = $conn->query('SELECT id, expense_name, expense_amount, expense_date FROM expenses ORDER BY expense_date DESC');
-                        $count = 1;
-                        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                            echo '<tr>';
-                            echo '<td>' . $count++ . '</td>';
-                            echo '<td>' . htmlspecialchars($row['expense_name']) . '</td>';
-                            echo '<td>' . number_format($row['expense_amount'], 2) . '</td>';
-                            echo '<td>' . $row['expense_date'] . '</td>';
-                            echo "<td>
+                        try {
+                            $pagination = paginate($conn, 'expenses', 'id, expense_name, expense_amount,  expense_date', '', 'expense_date DESC', 10);
+                            $count = ($pagination['current_page'] - 1) * 10 + 1;
+
+                            foreach ($pagination['data'] as $row) {
+                                echo '<tr>';
+                                echo '<td>' . $count++ . '</td>';
+                                echo '<td>' . htmlspecialchars($row['expense_name']) . '</td>';
+                                echo '<td>' . number_format($row['expense_amount'], 2) . '</td>';
+                                echo '<td>' . $row['expense_date'] . '</td>';
+                                echo "<td>
                                  <a href='edit.php?table=expenses&id=" . $row['id'] . "&redirect=expense.php' class='btn btn-sm btn-warning'>Edit</a>
                                  <a href='delete.php?table=expenses&id=" . $row['id'] . "&redirect=expense.php' class='btn btn-sm btn-danger' onclick=\"return confirm('Are you sure?');\">Delete</a>
 
                               </td>";
-                            echo '</tr>';
+                                echo '</tr>';
+                            }
+                        } catch (PDOException $e) {
+                            echo '<tr><td colspan="8" class="text-danger">Error: ' . $e->getMessage() . '</td></tr>';
                         }
                         ?>
                         <!-- Repeat rows dynamically using PHP -->
                     </tbody>
                 </table>
+                <?php
+                renderPagination($pagination['total_pages'], $pagination['current_page'], 'expense.php');
+                ?>
             </div>
         </div>
     </div>

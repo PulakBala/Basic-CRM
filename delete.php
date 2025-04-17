@@ -7,7 +7,7 @@ $id = $_GET['id'] ?? null;
 $redirect = $_GET['redirect'] ?? 'index.php'; // fallback
 
 // Allowed tables for safety
-$allowedTables = ['sales', 'expenses', 'products', 'contacts', 'dues', 'users'];
+$allowedTables = ['sales', 'expenses', 'products', 'contacts', 'dues', 'prices', 'users'];
 
 if ($table && $id && in_array($table, $allowedTables)) {
     $query = "DELETE FROM $table WHERE id = ?";

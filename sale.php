@@ -1,11 +1,7 @@
 <?php
-session_start();
-if (!isset($_SESSION['admin_logged_in'])) {
-    header('Location: login.php');
-    exit;
-}
 include ('includes/header.php');
 include ('includes/sidebar.php');
+include ('pagination.php');
 ?>
 <div class="container mt-5">
     <div class="card shadow-sm">
@@ -30,9 +26,11 @@ include ('includes/sidebar.php');
                         <?php
                      
 
-                        $stmt = $conn->query('SELECT id, sale_name, sale_amount, sale_date FROM sales ORDER BY sale_date DESC');
-                        $count = 1;
-                        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                     try {
+                        $pagination = paginate($conn, 'sales', 'id, sale_name, sale_amount,  sale_date', '', 'sale_date DESC', 10);
+                        $count = ($pagination['current_page'] - 1) * 10 + 1;
+
+                        foreach ($pagination['data'] as $row) {
                             echo '<tr>';
                             echo '<td>' . $count++ . '</td>';
                             echo '<td>' . htmlspecialchars($row['sale_name']) . '</td>';
@@ -45,10 +43,16 @@ include ('includes/sidebar.php');
                                  </td>";
                             echo '</tr>';
                         }
+                    } catch (PDOException $e) {
+                        echo '<tr><td colspan="8" class="text-danger">Error: ' . $e->getMessage() . '</td></tr>';
+                    }
                         ?>
                         <!-- Repeat rows dynamically using PHP -->
                     </tbody>
                 </table>
+                <?php
+                renderPagination($pagination['total_pages'], $pagination['current_page'], 'sale.php');
+                ?>
             </div>
         </div>
     </div>

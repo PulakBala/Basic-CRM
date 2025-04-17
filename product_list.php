@@ -1,11 +1,7 @@
 <?php
-session_start();
-if (!isset($_SESSION['admin_logged_in'])) {
-    header('Location: login.php');
-    exit;
-}
 include ('includes/header.php');
 include ('includes/sidebar.php');
+include('pagination.php');
 ?>
 <div class="container mt-5">
     <div class="card shadow-sm">
@@ -28,26 +24,33 @@ include ('includes/sidebar.php');
                     <tbody id="table-body">
                         <!-- Example row, replace with PHP loop -->
                         <?php
+                        try {
+                            $pagination = paginate($conn, 'products', 'id, product_name, product_amount, product_date', '', 'product_date DESC', 10);  
+                            $count = ($pagination['current_page'] - 1) * 10 + 1;
 
-                        $stmt = $conn->query('SELECT id, product_name, product_amount, product_date FROM products ORDER BY product_date DESC');
-                        $count = 1;
-                        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                            echo '<tr>';
-                            echo '<td>' . $count++ . '</td>';
-                            echo '<td>' . htmlspecialchars($row['product_name']) . '</td>';
-                            echo '<td>' . number_format($row['product_amount'], 2) . '</td>';
-                            echo '<td>' . $row['product_date'] . '</td>';
-                            echo "<td>
+                            foreach ($pagination['data'] as $row) {
+                                echo '<tr>';
+                                echo '<td>' . $count++ . '</td>';
+                                echo '<td>' . htmlspecialchars($row['product_name']) . '</td>';
+                                echo '<td>' . number_format($row['product_amount'], 2) . '</td>';
+                                echo '<td>' . $row['product_date'] . '</td>';
+                                echo "<td>
                                     <a href='edit.php?table=products&id=" . $row['id'] . "&redirect=product_list.php' class='btn btn-sm btn-warning'>Edit</a>
                                     <a href='delete.php?table=products&id=" . $row['id'] . "&redirect=product_list.php' class='btn btn-sm btn-danger' onclick=\"return confirm('Are you sure?');\">Delete</a>
 
                                  </td>";
-                            echo '</tr>';
+                                echo '</tr>';
+                            }
+                        } catch (PDOException $e) {
+                            echo '<tr><td colspan="8" class="text-danger">Error: ' . $e->getMessage() . '</td></tr>';
                         }
                         ?>
                         <!-- End example -->
                     </tbody>
                 </table>
+                <?php
+                renderPagination($pagination['total_pages'], $pagination['current_page'], 'product_list.php');
+                ?>
             </div>
         </div>
     </div>

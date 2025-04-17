@@ -6,6 +6,7 @@ if (!isset($_SESSION['admin_logged_in'])) {
 }
 include ('includes/header.php');
 include ('includes/sidebar.php');
+include('calculation_dashboard.php')
 ?>
 
 <div class="">
@@ -18,7 +19,7 @@ include ('includes/sidebar.php');
                         <h5 class="mb-0 text-center">Sale</h5>
                     </div>
                     <div class="card-body text-center text-black">
-                    <p>৳ 00</p>
+                    <p>৳ <?= number_format($monthlySales[date('Y-m')] ?? 0) ?></p>
                     </div>
                 </div>
             </div>
@@ -32,7 +33,7 @@ include ('includes/sidebar.php');
                         <h5 class="mb-0 text-center">Expense</h5>
                     </div>
                     <div class="card-body text-center text-black">
-                    <p>৳ 00</p>
+                    <p>৳ <?= number_format($monthlyExpenses[date('Y-m')] ?? 0) ?></p>
                     </div>
                 </div>
             </div>
@@ -45,7 +46,7 @@ include ('includes/sidebar.php');
                         <h5 class="mb-0 text-center">Total Sale</h5>
                     </div>
                     <div class="card-body text-center text-black">
-                    <p>৳ 00</p>
+                    <p>৳ <?= number_format($saleTotal) ?></p>
                     </div>
                 </div>
             </div>
@@ -58,7 +59,7 @@ include ('includes/sidebar.php');
                         <h5 class="mb-0 text-center">Total Expense</h5>
                     </div>
                     <div class="card-body text-center text-black">
-                    <p>৳ 00</p>
+                    <p>৳ <?= number_format($expenseTotal) ?></p>
                     </div>
                 </div>
             </div>

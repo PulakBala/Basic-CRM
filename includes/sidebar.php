@@ -52,6 +52,16 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link text-white" href="statement.php">
+                            <i class="fas fa-money-check-alt mr-2"></i> Statement
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="price.php">
+                            <i class="fas fa-money-check-alt mr-2"></i> Packages
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link text-danger" href="logout.php">
                                 <i class="fas fa-sign-out-alt mr-2"></i> Logout
                             </a>
